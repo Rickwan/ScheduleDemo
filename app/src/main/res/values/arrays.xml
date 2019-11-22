@@ -1,0 +1,29 @@
+<resources>
+    <string-array name="schedule">
+        <item>上午0时</item>
+        <item>上午1时</item>
+        <item>上午2时</item>
+        <item>上午3时</item>
+        <item>上午4时</item>
+        <item>上午5时</item>
+        <item>上午6时</item>
+        <item>上午7时</item>
+        <item>上午8时</item>
+        <item>上午9时</item>
+        <item>上午10时</item>
+        <item>上午11时</item>
+        <item>上午12时</item>
+        <item>下午1时</item>
+        <item>下午2时</item>
+        <item>下午3时</item>
+        <item>下午4时</item>
+        <item>下午5时</item>
+        <item>下午6时</item>
+        <item>下午7时</item>
+        <item>下午8时</item>
+        <item>下午9时</item>
+        <item>下午10时</item>
+        <item>下午11时</item>
+    </string-array>
+
+</resources>

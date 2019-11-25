@@ -12,8 +12,10 @@ import android.text.TextUtils
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewConfiguration
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.round
@@ -85,6 +87,12 @@ class ScheduleView : View {
 
     private var schedules: MutableList<ScheduleBean>? = null
 
+    private var downY: Float = 0f
+
+
+    private var mTouchSlop: Int = 0
+
+    private var onScheduleClickListener: OnScheduleClickListener? = null
 
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
@@ -99,6 +107,10 @@ class ScheduleView : View {
 
 
     private fun init() {
+
+
+        val configuration = ViewConfiguration.get(context)
+        mTouchSlop = configuration.scaledTouchSlop
 
         schedulePools = mutableListOf()
         scheduleItems = mutableListOf()
@@ -121,6 +133,12 @@ class ScheduleView : View {
 
         setBackgroundColor(Color.WHITE)
 
+
+    }
+
+    fun setOnScheduleClickListener(onScheduleClickListener: OnScheduleClickListener) {
+
+        this.onScheduleClickListener = onScheduleClickListener
     }
 
 
@@ -130,8 +148,6 @@ class ScheduleView : View {
 
         val sdf = SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
         val format = SimpleDateFormat("HH.mm")
-
-
 
         this.schedules?.sortWith(Comparator { o1, o2 ->
 
@@ -144,10 +160,6 @@ class ScheduleView : View {
                 var endTime2 = format.format(sdf.parse(o2.endDate)).toFloat()
 
                 var dateInterval = (endTime2 - startTime2) - (endTime1 - startTime1)
-
-
-
-
 
                 when {
                     dateInterval > 0 -> 1
@@ -441,7 +453,7 @@ class ScheduleView : View {
         var top = scheduleItem.top
         var right = scheduleItem.right
         var bottom = scheduleItem.bottom
-        var width = scheduleItem.width
+        var itemWidth = scheduleItem.width
         var title = scheduleItem.title
 
         itemPaint.color = bgLineColor
@@ -466,7 +478,7 @@ class ScheduleView : View {
         }
 
         var buidler =
-            StaticLayout.Builder.obtain(title, 0, title.length, textPaint, width.toInt() - 40)
+            StaticLayout.Builder.obtain(title, 0, title.length, textPaint, itemWidth.toInt() - 40)
 
         buidler.setAlignment(Layout.Alignment.ALIGN_NORMAL)
         buidler.setMaxLines(count.toInt())
@@ -504,9 +516,9 @@ class ScheduleView : View {
         var startPosition = startPosition
         var endPosition = endPosition
 
-        var width = (width - offsetLeftPadding - padding * 3) / 4
+        var itemWidth = (width - offsetLeftPadding - padding * 3) / 4
         var left = if (offsetCount > 0) {
-            offsetLeftPadding + (width + 10) * offsetCount
+            offsetLeftPadding + (itemWidth + 10) * offsetCount
         } else {
             offsetLeftPadding
         }
@@ -518,7 +530,7 @@ class ScheduleView : View {
                 itemHeight * 60 * endPosition - 10
             }
 
-        var right = left + width
+        var right = left + itemWidth
         itemPaint.color = bgLineColor
         canvas.drawRoundRect(left, top, right, bottom, 12f, 10f, itemPaint)
         itemPaint.color = validItemColor
@@ -541,7 +553,7 @@ class ScheduleView : View {
         }
 
         var buidler =
-            StaticLayout.Builder.obtain(title, 0, title.length, textPaint, width.toInt() - 20)
+            StaticLayout.Builder.obtain(title, 0, title.length, textPaint, itemWidth.toInt() - 20)
 
         buidler.setAlignment(Layout.Alignment.ALIGN_NORMAL)
         buidler.setMaxLines(count.toInt())
@@ -551,20 +563,113 @@ class ScheduleView : View {
         canvas.translate(-(left + 25), -top - 10)
     }
 
+
+    private fun getScheduleIdByClick(x: Float, y: Float) {
+
+        if (schedules.isNullOrEmpty()) {
+            return
+        }
+
+        if (isClickSchedulePool(x, y)) {
+            onScheduleClickListener?.onMoreItemClicked()
+        }
+
+        var id = isClickSchedule(x, y)
+
+        if (!id.isNullOrEmpty()) {
+            schedules?.forEach {
+                if (it.id == id) {
+                    onScheduleClickListener?.onItemClicked(it)
+                    return@forEach
+                }
+            }
+        }
+    }
+
+
+    /**
+     * 是否点击了日程
+     */
+    private fun isClickSchedule(x: Float, y: Float): String? {
+
+        if (scheduleItems.isNullOrEmpty()) {
+            return null
+        }
+        var scheduleId: String? = null
+        scheduleItems.forEach {
+            var left = it.left
+            var top = it.top
+            var right = it.right
+            var bottom = it.bottom
+
+
+            if (x in left..right && y in top..bottom) {
+                scheduleId = it.id
+                return@forEach
+            }
+
+        }
+
+        return scheduleId
+    }
+
+    /**
+     * 是否点击了更多日程
+     */
+    private fun isClickSchedulePool(x: Float, y: Float): Boolean {
+
+        var isClickSchedulePool = false
+        schedulePools.forEach {
+
+            var offsetCount = 3
+
+            var startPosition = it.startPosition
+            var endPosition = it.endPosition
+
+            var itemWidth = (width - offsetLeftPadding - padding * 3) / 4
+            var left = if (offsetCount > 0) {
+                offsetLeftPadding + (itemWidth + 10) * offsetCount
+            } else {
+                offsetLeftPadding
+            }
+            var top = itemHeight * 60 * startPosition + 10
+            var bottom =
+                if (endPosition - floor(endPosition) != 0f) {
+                    itemHeight * 60 * endPosition + 10
+                } else {
+                    itemHeight * 60 * endPosition - 10
+                }
+
+            var right = left + itemWidth
+
+            if (x in left..right && y in top..bottom) {
+                isClickSchedulePool = true
+
+                return@forEach
+            }
+
+
+        }
+
+        return isClickSchedulePool
+
+    }
+
     override fun onTouchEvent(event: MotionEvent): Boolean {
 
         when (event.action) {
-
             MotionEvent.ACTION_DOWN -> {
-
-            }
-
-            MotionEvent.ACTION_MOVE -> {
-
+                downY = event.y
+                return true
             }
 
             MotionEvent.ACTION_UP -> {
+                var x = event.x
+                var y = event.y
 
+                if (abs(y - downY) < mTouchSlop) {
+                    getScheduleIdByClick(x, y)
+                }
             }
         }
 

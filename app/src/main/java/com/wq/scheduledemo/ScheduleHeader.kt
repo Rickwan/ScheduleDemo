@@ -1,10 +1,7 @@
 package com.wq.scheduledemo
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Rect
+import android.graphics.*
 import android.text.Layout
 import android.text.StaticLayout
 import android.text.TextPaint
@@ -113,7 +110,6 @@ class ScheduleHeader : View {
         val configuration = ViewConfiguration.get(context)
         mTouchSlop = configuration.scaledTouchSlop
         textPaint = TextPaint()
-        textPaint.textSize = 30f
         textPaint.color = leftLabelColor
         textPaint.textAlign = Paint.Align.LEFT
         textPaint.isAntiAlias = true
@@ -151,15 +147,16 @@ class ScheduleHeader : View {
         paint.color = Color.parseColor("#f2f2f2")
         paint.isAntiAlias = true
         paint.style = Paint.Style.FILL
-        paint.strokeWidth = 2f
         canvas.drawLine(0f, height.toFloat(), width.toFloat(), height.toFloat(), paint)
 
         textPaint.color = leftLabelColor
 
         var label = "上午12时"
         var rect = Rect()
+        textPaint.textSize = 26f//为了保持左间距与日程值相同
         textPaint.getTextBounds(label, 0, label.length, rect)
         offsetLeftPadding = rect.width() + padding * 2
+        textPaint.textSize = 30f
 
         var textStartY = height / 2 + rect.height() / 2
         canvas.drawText("全天", padding, textStartY.toFloat(), textPaint)
@@ -180,7 +177,7 @@ class ScheduleHeader : View {
         var itemWidth = if (schedules!!.size > 1) {
             (width - offsetLeftPadding - padding * 3) / 4 * 3
         } else {
-            (width - offsetLeftPadding - padding * 3)
+            offsetLeftPadding
         }
         var left = offsetLeftPadding
         var top = 20f
@@ -188,16 +185,26 @@ class ScheduleHeader : View {
         var right = left + itemWidth
         var title = scheduleItem.title
 
-        itemPaint.color = bgLineColor
-        canvas.drawRoundRect(left, top, right, bottom, 12f, 10f, itemPaint)
-        itemPaint.color = if (scheduleItem.type == 0) validItemColor else invalidItemColor
-        canvas.drawRoundRect(left, top, left + 40, bottom, 12f, 10f, itemPaint)
-        itemPaint.color = bgLineColor
-        canvas.drawRect(left + 10, top, left + 30, bottom, itemPaint)
-        itemPaint.color = Color.WHITE
-        canvas.drawRect(left + 10, top + 1, left + 30, bottom - 1, itemPaint)
-        canvas.drawRoundRect(left + 20, top + 1, right - 1, bottom - 1, 12f, 10f, itemPaint)
 
+//        itemPaint.color = bgLineColor
+//        canvas.drawRoundRect(left, top, right, bottom, 12f, 10f, itemPaint)
+//        itemPaint.color = if (scheduleItem.type == 0) validItemColor else invalidItemColor
+//        canvas.drawRoundRect(left, top, left + 40, bottom, 12f, 10f, itemPaint)
+//        itemPaint.color = bgLineColor
+//        canvas.drawRect(left + 10, top, left + 30, bottom, itemPaint)
+//        itemPaint.color = Color.WHITE
+//        canvas.drawRect(left + 10, top + 1, left + 30, bottom - 1, itemPaint)
+//        canvas.drawRoundRect(left + 20, top + 1, right - 1, bottom - 1, 12f, 10f, itemPaint)
+
+
+        drawItem(
+            canvas,
+            left,
+            top,
+            right,
+            bottom,
+            if (scheduleItem.type == 0) validItemColor else invalidItemColor
+        )
         textPaint.textSize = 30f
         textPaint.color = textColor
 
@@ -236,15 +243,17 @@ class ScheduleHeader : View {
         var top = 20f
         var bottom = height - 20f
 
-        itemPaint.color = bgLineColor
-        canvas.drawRoundRect(left, top, right, bottom, 12f, 10f, itemPaint)
-        itemPaint.color = validItemColor
-        canvas.drawRoundRect(left, top, left + 40, bottom, 12f, 10f, itemPaint)
-        itemPaint.color = bgLineColor
-        canvas.drawRect(left + 10, top, left + 30, bottom, itemPaint)
-        itemPaint.color = Color.WHITE
-        canvas.drawRect(left + 10, top + 1, left + 30, bottom - 1, itemPaint)
-        canvas.drawRoundRect(left + 20, top + 1, right - 1, bottom - 1, 12f, 10f, itemPaint)
+//        itemPaint.color = bgLineColor
+//        canvas.drawRoundRect(left, top, right, bottom, 12f, 10f, itemPaint)
+//        itemPaint.color = validItemColor
+//        canvas.drawRoundRect(left, top, left + 40, bottom, 12f, 10f, itemPaint)
+//        itemPaint.color = bgLineColor
+//        canvas.drawRect(left + 10, top, left + 30, bottom, itemPaint)
+//        itemPaint.color = Color.WHITE
+//        canvas.drawRect(left + 10, top + 1, left + 30, bottom - 1, itemPaint)
+//        canvas.drawRoundRect(left + 20, top + 1, right - 1, bottom - 1, 12f, 10f, itemPaint)
+
+        drawItem(canvas, left, top, right, bottom, validItemColor)
 
         textPaint.textSize = 50f
         textPaint.color = validItemColor
@@ -263,7 +272,52 @@ class ScheduleHeader : View {
         canvas.translate(-(left + 25), -top - offset)
     }
 
-    fun getScheduleIdByClick(x: Float, y: Float) {
+
+    private fun drawItem(
+        canvas: Canvas,
+        left: Float,
+        top: Float,
+        right: Float,
+        bottom: Float,
+        headerColor: Int
+    ) {
+
+        itemPaint.strokeWidth = 1f
+        itemPaint.color = headerColor
+        itemPaint.style = Paint.Style.FILL_AND_STROKE
+
+        var radii = 9f
+        var headerPath = Path()
+        headerPath.addRoundRect(
+            left, top, left + 10f, bottom,
+            floatArrayOf(radii, radii, 0f, 0f, 0f, 0f, radii, radii),
+            Path.Direction.CCW
+        )
+
+        canvas.drawPath(headerPath, itemPaint)
+
+        itemPaint.color = bgLineColor
+        itemPaint.style = Paint.Style.STROKE
+        var strokePath = Path()
+        strokePath.addRoundRect(
+            left + 10f, top, right, bottom,
+            floatArrayOf(0f, 0f, radii, radii, radii, radii, 0f, 0f),
+            Path.Direction.CCW
+        )
+        canvas.drawPath(strokePath, itemPaint)
+
+        itemPaint.color = Color.WHITE
+        itemPaint.style = Paint.Style.FILL_AND_STROKE
+        var contentPath = Path()
+        contentPath.addRoundRect(
+            left + 10f, top + 1f, right - 1f, bottom - 1f,
+            floatArrayOf(0f, 0f, radii, radii, radii, radii, 0f, 0f),
+            Path.Direction.CCW
+        )
+        canvas.drawPath(contentPath, itemPaint)
+    }
+
+    private fun getScheduleIdByClick(x: Float, y: Float) {
 
         if (schedules.isNullOrEmpty()) {
             return

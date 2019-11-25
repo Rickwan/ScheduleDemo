@@ -65,6 +65,7 @@ class MainActivity : AppCompatActivity() {
                 "2019/11/12 23:59:00"
             )
         )
+        beans.add(ScheduleBean("12", "日程12", 0, "2019/11/12 11:00:00", "2019/11/12 12:10:00"))
 
 
         scheduleLt.setData(beans)

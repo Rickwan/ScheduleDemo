@@ -1,10 +1,7 @@
 package com.wq.scheduledemo
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Rect
+import android.graphics.*
 import android.text.Layout
 import android.text.StaticLayout
 import android.text.TextPaint
@@ -350,8 +347,9 @@ class ScheduleView : View {
         linePaint.color = bgLineColor
         textPaint.color = leftLabelColor
 
+        var label = "上午12时"
         var rect = Rect()
-        textPaint.getTextBounds("上午12时", 0, 5, rect)
+        textPaint.getTextBounds(label, 0, label.length, rect)
         offsetLeftPadding = rect.width() + padding * 2
 
         var labels = context.resources.getStringArray(R.array.schedule)
@@ -433,6 +431,51 @@ class ScheduleView : View {
 
     }
 
+    private fun drawItem(
+        canvas: Canvas,
+        left: Float,
+        top: Float,
+        right: Float,
+        bottom: Float,
+        headerColor: Int
+    ) {
+
+        itemPaint.strokeWidth = 1f
+        itemPaint.color = headerColor
+        itemPaint.style = Paint.Style.FILL_AND_STROKE
+
+        var radii = 9f
+
+        var headerPath = Path()
+        headerPath.addRoundRect(
+            left, top, left + 10f, bottom,
+            floatArrayOf(radii, radii, 0f, 0f, 0f, 0f, radii, radii),
+            Path.Direction.CCW
+        )
+
+        canvas.drawPath(headerPath, itemPaint)
+
+        itemPaint.color = Color.parseColor("#AEB5C2")
+        itemPaint.style = Paint.Style.STROKE
+        var strokePath = Path()
+        strokePath.addRoundRect(
+            left + 10f, top, right, bottom,
+            floatArrayOf(0f, 0f, radii, radii, radii, radii, 0f, 0f),
+            Path.Direction.CCW
+        )
+        canvas.drawPath(strokePath, itemPaint)
+
+        itemPaint.color = Color.WHITE
+        itemPaint.style = Paint.Style.FILL_AND_STROKE
+        var contentPath = Path()
+        contentPath.addRoundRect(
+            left + 10f, top + 1f, right - 1f, bottom - 1f,
+            floatArrayOf(0f, 0f, radii, radii, radii, radii, 0f, 0f),
+            Path.Direction.CCW
+        )
+        canvas.drawPath(contentPath, itemPaint)
+    }
+
     /**
      * 绘制日程
      */
@@ -443,6 +486,7 @@ class ScheduleView : View {
         }
 
     }
+
 
     /**
      * 绘制日程item
@@ -456,15 +500,17 @@ class ScheduleView : View {
         var itemWidth = scheduleItem.width
         var title = scheduleItem.title
 
-        itemPaint.color = bgLineColor
-        canvas.drawRoundRect(left, top, right, bottom, 12f, 10f, itemPaint)
-        itemPaint.color = if (scheduleItem.type == 0) validItemColor else invalidItemColor
-        canvas.drawRoundRect(left, top, left + 40, bottom, 12f, 10f, itemPaint)
-        itemPaint.color = bgLineColor
-        canvas.drawRect(left + 10, top, left + 30, bottom, itemPaint)
-        itemPaint.color = Color.WHITE
-        canvas.drawRect(left + 10, top + 1, left + 30, bottom - 1, itemPaint)
-        canvas.drawRoundRect(left + 20, top + 1, right - 1, bottom - 1, 12f, 10f, itemPaint)
+//        itemPaint.color = bgLineColor
+//        canvas.drawRoundRect(left, top, right, bottom, 12f, 10f, itemPaint)
+//        itemPaint.color = if (scheduleItem.type == 0) validItemColor else invalidItemColor
+//        canvas.drawRoundRect(left, top, left + 40, bottom, 12f, 10f, itemPaint)
+//        itemPaint.color = bgLineColor
+//        canvas.drawRect(left + 10, top, left + 30, bottom, itemPaint)
+//        itemPaint.color = Color.WHITE
+//        canvas.drawRect(left + 10, top + 1, left + 30, bottom - 1, itemPaint)
+//        canvas.drawRoundRect(left + 20, top + 1, right - 1, bottom - 1, 12f, 10f, itemPaint)
+
+        drawItem(canvas, left, top, right, bottom, if (scheduleItem.type == 0) validItemColor else invalidItemColor)
 
         textPaint.textSize = 30f
         textPaint.color = textColor
@@ -531,15 +577,17 @@ class ScheduleView : View {
             }
 
         var right = left + itemWidth
-        itemPaint.color = bgLineColor
-        canvas.drawRoundRect(left, top, right, bottom, 12f, 10f, itemPaint)
-        itemPaint.color = validItemColor
-        canvas.drawRoundRect(left, top, left + 40, bottom, 12f, 10f, itemPaint)
-        itemPaint.color = bgLineColor
-        canvas.drawRect(left + 10, top, left + 30, bottom, itemPaint)
-        itemPaint.color = Color.WHITE
-        canvas.drawRect(left + 10, top + 1, left + 30, bottom - 1, itemPaint)
-        canvas.drawRoundRect(left + 20, top + 1, right - 1, bottom - 1, 12f, 10f, itemPaint)
+//        itemPaint.color = bgLineColor
+//        canvas.drawRoundRect(left, top, right, bottom, 12f, 10f, itemPaint)
+//        itemPaint.color = validItemColor
+//        canvas.drawRoundRect(left, top, left + 40, bottom, 12f, 10f, itemPaint)
+//        itemPaint.color = bgLineColor
+//        canvas.drawRect(left + 10, top, left + 30, bottom, itemPaint)
+//        itemPaint.color = Color.WHITE
+//        canvas.drawRect(left + 10, top + 1, left + 30, bottom - 1, itemPaint)
+//        canvas.drawRoundRect(left + 20, top + 1, right - 1, bottom - 1, 12f, 10f, itemPaint)
+
+        drawItem(canvas, left, top, right, bottom, validItemColor)
 
         textPaint.textSize = 50f
         textPaint.color = validItemColor

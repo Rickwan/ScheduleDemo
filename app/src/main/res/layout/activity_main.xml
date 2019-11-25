@@ -3,14 +3,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimary"
+    android:background="#ffffff"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
+
+    <com.wq.scheduledemo.RoundView
+        android:layout_width="match_parent"
+        android:layout_margin="20dp"
+        android:visibility="gone"
+        android:layout_height="wrap_content" />
 
     <com.wq.scheduledemo.ScheduleLayout
         android:id="@+id/scheduleLt"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#ffffff"/>
+        android:layout_height="match_parent" />
 
 </LinearLayout>

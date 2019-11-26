@@ -30,6 +30,8 @@ class ScheduleView : View {
      */
     private var itemHeight: Int = 2
 
+    private var itemCount: Int = 25
+
     /**
      * 左右上下间距
      */
@@ -189,7 +191,7 @@ class ScheduleView : View {
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
 
         var heightSpec = MeasureSpec.makeMeasureSpec(
-            itemHeight * 25 * 60 + 2 * padding.toInt(),
+            itemHeight * itemCount * 60 + 2 * padding.toInt(),
             MeasureSpec.EXACTLY
         )
         super.onMeasure(widthMeasureSpec, heightSpec)
@@ -207,7 +209,6 @@ class ScheduleView : View {
             drawSchedulePool(it)
             drawCurrentBaseLine(it)
         }
-
     }
 
 
@@ -408,12 +409,7 @@ class ScheduleView : View {
             "下午$hour:${if (minute < 10) "0$minute" else minute}"
         }
 
-        var startY =
-            if (isAm) {
-                itemHeight * hour * 60.toFloat() + minute * itemHeight
-            } else {
-                itemHeight * (hour + 12) * 60.toFloat() + minute * itemHeight
-            }
+        var startY = getBaseLinePosition()
 
         var rect = Rect()
         textPaint.getTextBounds(label, 0, label.length, rect)
@@ -428,6 +424,24 @@ class ScheduleView : View {
             startY,
             linePaint
         )
+
+    }
+
+
+    fun getBaseLinePosition(): Float {
+
+        var calendar = Calendar.getInstance()
+        var hour = calendar.get(Calendar.HOUR)
+        var minute = calendar.get(Calendar.MINUTE)
+
+        var isAm = calendar.get(Calendar.AM_PM) == Calendar.AM
+
+        return if (isAm) {
+            itemHeight * hour * 60.toFloat() + minute * itemHeight
+        } else {
+            itemHeight * (hour + 12) * 60.toFloat() + minute * itemHeight
+        }
+
 
     }
 
@@ -510,7 +524,14 @@ class ScheduleView : View {
 //        canvas.drawRect(left + 10, top + 1, left + 30, bottom - 1, itemPaint)
 //        canvas.drawRoundRect(left + 20, top + 1, right - 1, bottom - 1, 12f, 10f, itemPaint)
 
-        drawItem(canvas, left, top, right, bottom, if (scheduleItem.type == 0) validItemColor else invalidItemColor)
+        drawItem(
+            canvas,
+            left,
+            top,
+            right,
+            bottom,
+            if (scheduleItem.type == 0) validItemColor else invalidItemColor
+        )
 
         textPaint.textSize = 30f
         textPaint.color = textColor

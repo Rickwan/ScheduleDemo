@@ -262,13 +262,13 @@ class ScheduleHeader : View {
         textPaint.getTextBounds(title, 0, title.length, rect)
         var offset = height / 2 - rect.height() / 2 - rect.height()
 
-        var buidler =
+        var builder =
             StaticLayout.Builder.obtain(title, 0, title.length, textPaint, itemWidth.toInt() - 20)
-        buidler.setAlignment(Layout.Alignment.ALIGN_NORMAL)
-        buidler.setMaxLines(1)
-        buidler.setEllipsize(TextUtils.TruncateAt.END)
+        builder.setAlignment(Layout.Alignment.ALIGN_NORMAL)
+        builder.setMaxLines(1)
+        builder.setEllipsize(TextUtils.TruncateAt.END)
         canvas.translate(left + 25, top + offset)
-        buidler.build().draw(canvas)
+        builder.build().draw(canvas)
         canvas.translate(-(left + 25), -top - offset)
     }
 

@@ -21,6 +21,8 @@ class ScheduleLayout : LinearLayout {
 
     private lateinit var scroller: Scroller
 
+    private lateinit var scrollView: ScrollView
+
     private var mTouchSlop: Int = 0
 
     private var schedules: MutableList<ScheduleBean>? = null
@@ -51,11 +53,12 @@ class ScheduleLayout : LinearLayout {
         scheduleHeader = ScheduleHeader(context)
         addView(scheduleHeader)
 
-        var scrollView = ScrollView(context)
+        scrollView = ScrollView(context)
         scrollView.isVerticalScrollBarEnabled = false
         scheduleView = ScheduleView(context)
         scrollView.addView(scheduleView)
         addView(scrollView)
+
 
     }
 
@@ -90,6 +93,13 @@ class ScheduleLayout : LinearLayout {
         scheduleView.setData(otherSchedules)
         scheduleHeader.setData(allDaySchedules)
         invalidate()
+
+        scrollView.postDelayed({
+
+            scrollView.scrollTo(0, scheduleView.getBaseLinePosition().toInt() - height / 2)
+        }, 100)
+
+
     }
 
 

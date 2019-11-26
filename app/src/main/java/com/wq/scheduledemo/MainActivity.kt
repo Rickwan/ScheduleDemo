@@ -66,6 +66,12 @@ class MainActivity : AppCompatActivity() {
             )
         )
         beans.add(ScheduleBean("12", "日程12", 0, "2019/11/12 11:00:00", "2019/11/12 12:10:00"))
+        beans.add(ScheduleBean("13", "日程13", 0, "2019/11/12 00:00:00", "2019/11/12 00:10:00"))
+        beans.add(ScheduleBean("14", "日程14", 0, "2019/11/12 00:00:00", "2019/11/12 00:10:00"))
+        beans.add(ScheduleBean("15", "日程15", 1, "2019/11/12 00:00:00", "2019/11/12 00:10:00"))
+        beans.add(ScheduleBean("16", "日程16", 0, "2019/11/12 00:00:00", "2019/11/12 00:10:00"))
+        beans.add(ScheduleBean("17", "日程17", 0, "2019/11/12 00:00:00", "2019/11/12 00:10:00"))
+        beans.add(ScheduleBean("18", "日程18", 0, "2019/11/12 00:00:00", "2019/11/12 00:10:00"))
 
 
         scheduleLt.setData(beans)

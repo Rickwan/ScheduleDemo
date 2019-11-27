@@ -7,6 +7,7 @@ import android.text.StaticLayout
 import android.text.TextPaint
 import android.text.TextUtils
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewConfiguration
@@ -86,7 +87,7 @@ class ScheduleHeader : View {
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         var heightSpec = MeasureSpec.makeMeasureSpec(
-            120,
+            dp2px(40f).toInt(),
             MeasureSpec.EXACTLY
         )
         super.onMeasure(widthMeasureSpec, heightSpec)
@@ -153,10 +154,10 @@ class ScheduleHeader : View {
 
         var label = "上午12时"
         var rect = Rect()
-        textPaint.textSize = 26f//为了保持左间距与日程值相同
+        textPaint.textSize = sp2px(10f)//为了保持左间距与日程值相同
         textPaint.getTextBounds(label, 0, label.length, rect)
         offsetLeftPadding = rect.width() + padding * 2
-        textPaint.textSize = 30f
+        textPaint.textSize =sp2px(11f)
 
         var textStartY = height / 2 + rect.height() / 2
         canvas.drawText("全天", padding, textStartY.toFloat(), textPaint)
@@ -205,7 +206,7 @@ class ScheduleHeader : View {
             bottom,
             if (scheduleItem.type == 0) validItemColor else invalidItemColor
         )
-        textPaint.textSize = 30f
+        textPaint.textSize =sp2px(12f)
         textPaint.color = textColor
 
         var rect = Rect()
@@ -254,8 +255,8 @@ class ScheduleHeader : View {
 //        canvas.drawRoundRect(left + 20, top + 1, right - 1, bottom - 1, 12f, 10f, itemPaint)
 
         drawItem(canvas, left, top, right, bottom, validItemColor)
+        textPaint.textSize =sp2px(18f)
 
-        textPaint.textSize = 50f
         textPaint.color = validItemColor
 
         var rect = Rect()
@@ -289,7 +290,7 @@ class ScheduleHeader : View {
         var radii = 9f
         var headerPath = Path()
         headerPath.addRoundRect(
-            left, top, left + 10f, bottom,
+            left, top, left + dp2px(3f), bottom,
             floatArrayOf(radii, radii, 0f, 0f, 0f, 0f, radii, radii),
             Path.Direction.CCW
         )
@@ -300,7 +301,7 @@ class ScheduleHeader : View {
         itemPaint.style = Paint.Style.STROKE
         var strokePath = Path()
         strokePath.addRoundRect(
-            left + 10f, top, right, bottom,
+            left + dp2px(3f), top, right, bottom,
             floatArrayOf(0f, 0f, radii, radii, radii, radii, 0f, 0f),
             Path.Direction.CCW
         )
@@ -310,7 +311,7 @@ class ScheduleHeader : View {
         itemPaint.style = Paint.Style.FILL_AND_STROKE
         var contentPath = Path()
         contentPath.addRoundRect(
-            left + 10f, top + 1f, right - 1f, bottom - 1f,
+            left + dp2px(3f), top + 1f, right - 1f, bottom - 1f,
             floatArrayOf(0f, 0f, radii, radii, radii, radii, 0f, 0f),
             Path.Direction.CCW
         )
@@ -387,5 +388,16 @@ class ScheduleHeader : View {
         }
 
         return super.onTouchEvent(event)
+    }
+
+
+    private fun dp2px(dp: Float): Float {
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, resources.displayMetrics)
+
+    }
+
+    private fun sp2px(sp: Float): Float {
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, resources.displayMetrics)
+
     }
 }

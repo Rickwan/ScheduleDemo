@@ -2,6 +2,7 @@ package com.wq.scheduledemo
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -78,10 +79,15 @@ class MainActivity : AppCompatActivity() {
         scheduleLt.setOnScheduleClickListener(object : OnScheduleClickListener {
             override fun onItemClicked(scheduleBean: ScheduleBean) {
                 Log.i("tag", "点击日程：${scheduleBean.id},${scheduleBean.title}")
+
+                Toast.makeText(this@MainActivity,"点击日程：${scheduleBean.id},${scheduleBean.title}",Toast.LENGTH_SHORT).show()
+
             }
 
             override fun onMoreItemClicked() {
                 Log.i("tag", "查看更多")
+
+                Toast.makeText(this@MainActivity,"查看更多",Toast.LENGTH_SHORT).show()
             }
 
         })

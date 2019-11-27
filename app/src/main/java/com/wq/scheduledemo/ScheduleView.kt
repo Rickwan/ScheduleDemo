@@ -7,6 +7,7 @@ import android.text.StaticLayout
 import android.text.TextPaint
 import android.text.TextUtils
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewConfiguration
@@ -28,7 +29,7 @@ class ScheduleView : View {
     /**
      * 每分钟的刻度高度
      */
-    private var itemHeight: Int = 2
+    private var itemHeight: Float = 0f
 
     private var itemCount: Int = 25
 
@@ -108,6 +109,9 @@ class ScheduleView : View {
     private fun init() {
 
 
+        itemHeight = dp2px(50f)
+
+
         val configuration = ViewConfiguration.get(context)
         mTouchSlop = configuration.scaledTouchSlop
 
@@ -119,7 +123,6 @@ class ScheduleView : View {
         linePaint.isAntiAlias = true
 
         textPaint = TextPaint()
-        textPaint.textSize = 26f
         textPaint.color = leftLabelColor
         textPaint.textAlign = Paint.Align.LEFT
         textPaint.isAntiAlias = true
@@ -191,7 +194,7 @@ class ScheduleView : View {
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
 
         var heightSpec = MeasureSpec.makeMeasureSpec(
-            itemHeight * itemCount * 60 + 2 * padding.toInt(),
+            (itemHeight * itemCount + 2 * padding).toInt(),
             MeasureSpec.EXACTLY
         )
         super.onMeasure(widthMeasureSpec, heightSpec)
@@ -304,12 +307,12 @@ class ScheduleView : View {
                     } else {
                         offsetLeftPadding
                     }
-                    var top = itemHeight * 60 * startPosition + 10
+                    var top = itemHeight * startPosition + 10
                     var bottom =
                         if (endPosition - floor(endPosition) != 0f) {
-                            itemHeight * 60 * endPosition + 10
+                            itemHeight * endPosition + 10
                         } else {
-                            itemHeight * 60 * endPosition - 10
+                            itemHeight * endPosition - 10
                         }
 
                     var right = left + width
@@ -347,6 +350,7 @@ class ScheduleView : View {
         canvas.translate(0f, 20f)
         linePaint.color = bgLineColor
         textPaint.color = leftLabelColor
+        textPaint.textSize = sp2px(10f)
 
         var label = "上午12时"
         var rect = Rect()
@@ -357,7 +361,7 @@ class ScheduleView : View {
 
         for ((position, label) in labels.withIndex()) {
 
-            var startY = itemHeight * 60 * position.toFloat()
+            var startY = itemHeight * position.toFloat()
             var textStartY = startY + rect.height() / 2 - 2
 
             canvas.drawText(label, padding, textStartY, textPaint)
@@ -371,7 +375,7 @@ class ScheduleView : View {
 
             if (position == labels.size - 1) {
 
-                var startY = itemHeight * 60 * (position + 1).toFloat()
+                var startY = itemHeight * (position + 1).toFloat()
 
                 canvas.drawLine(
                     rect.width() + padding * 2,
@@ -394,7 +398,7 @@ class ScheduleView : View {
 
         linePaint.color = baseLineColor
 
-        textPaint.textSize = 26f
+        textPaint.textSize = sp2px(9f)
         textPaint.color = baseLineColor
 
         var calendar = Calendar.getInstance()
@@ -437,9 +441,9 @@ class ScheduleView : View {
         var isAm = calendar.get(Calendar.AM_PM) == Calendar.AM
 
         return if (isAm) {
-            itemHeight * hour * 60.toFloat() + minute * itemHeight
+            itemHeight * hour.toFloat() + minute * itemHeight / 60
         } else {
-            itemHeight * (hour + 12) * 60.toFloat() + minute * itemHeight
+            itemHeight * (hour + 12).toFloat() + minute * itemHeight / 60
         }
 
 
@@ -462,7 +466,7 @@ class ScheduleView : View {
 
         var headerPath = Path()
         headerPath.addRoundRect(
-            left, top, left + 10f, bottom,
+            left, top, left + dp2px(3f), bottom,
             floatArrayOf(radii, radii, 0f, 0f, 0f, 0f, radii, radii),
             Path.Direction.CCW
         )
@@ -473,7 +477,7 @@ class ScheduleView : View {
         itemPaint.style = Paint.Style.STROKE
         var strokePath = Path()
         strokePath.addRoundRect(
-            left + 10f, top, right, bottom,
+            left + dp2px(3f), top, right, bottom,
             floatArrayOf(0f, 0f, radii, radii, radii, radii, 0f, 0f),
             Path.Direction.CCW
         )
@@ -483,7 +487,7 @@ class ScheduleView : View {
         itemPaint.style = Paint.Style.FILL_AND_STROKE
         var contentPath = Path()
         contentPath.addRoundRect(
-            left + 10f, top + 1f, right - 1f, bottom - 1f,
+            left + dp2px(3f), top + 1f, right - 1f, bottom - 1f,
             floatArrayOf(0f, 0f, radii, radii, radii, radii, 0f, 0f),
             Path.Direction.CCW
         )
@@ -533,7 +537,7 @@ class ScheduleView : View {
             if (scheduleItem.type == 0) validItemColor else invalidItemColor
         )
 
-        textPaint.textSize = 30f
+        textPaint.textSize = sp2px(12f)
         textPaint.color = textColor
 
         var rect = Rect()
@@ -589,12 +593,12 @@ class ScheduleView : View {
         } else {
             offsetLeftPadding
         }
-        var top = itemHeight * 60 * startPosition + 10
+        var top = itemHeight  * startPosition + 10
         var bottom =
             if (endPosition - floor(endPosition) != 0f) {
-                itemHeight * 60 * endPosition + 10
+                itemHeight  * endPosition + 10
             } else {
-                itemHeight * 60 * endPosition - 10
+                itemHeight  * endPosition - 10
             }
 
         var right = left + itemWidth
@@ -610,7 +614,7 @@ class ScheduleView : View {
 
         drawItem(canvas, left, top, right, bottom, validItemColor)
 
-        textPaint.textSize = 50f
+        textPaint.textSize = sp2px(18f)
         textPaint.color = validItemColor
 
         var rect = Rect()
@@ -701,12 +705,12 @@ class ScheduleView : View {
             } else {
                 offsetLeftPadding
             }
-            var top = itemHeight * 60 * startPosition + 10
+            var top = itemHeight  * startPosition + 10
             var bottom =
                 if (endPosition - floor(endPosition) != 0f) {
-                    itemHeight * 60 * endPosition + 10
+                    itemHeight  * endPosition + 10
                 } else {
-                    itemHeight * 60 * endPosition - 10
+                    itemHeight  * endPosition - 10
                 }
 
             var right = left + itemWidth
@@ -745,5 +749,15 @@ class ScheduleView : View {
         return super.onTouchEvent(event)
     }
 
+
+    private fun dp2px(dp: Float): Float {
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, resources.displayMetrics)
+
+    }
+
+    private fun sp2px(sp: Float): Float {
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, resources.displayMetrics)
+
+    }
 
 }
